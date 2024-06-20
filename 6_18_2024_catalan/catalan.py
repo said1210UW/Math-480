@@ -1,5 +1,5 @@
 import itertools
-
+#
 def parenthesizations(n):
   """
   Returns a list of all possible parenthesizations of length n.
