@@ -13,3 +13,6 @@ You **are not** allowed to copy and paste code from other students in the class 
 1. Fork this repository into your own account.
 2. Create a new branch for each assignment and title the branch with the assignment date.
 3. Implement the assignment and push your code to GitHub so that it is timestamped. Your final submission commit should have the tag `[SUBMISSION]` in the commit message.
+
+# Solutions
+For each assignment, solutions will be posted under a branch with the corresponding name of the day and assignment. You can clone this repository and checkout the solution branches if you want to experiment with the code locally, or you can view them on GitHub by selecting the appropriate branch.
