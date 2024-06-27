@@ -18,9 +18,34 @@ def parenthesization_to_tensor(parenthesization):
         The tensor has shape (4*n), where 2*n is the length of the parenthesization string.
         Each element in the tensor is either 0 or 1, representing whether the corresponding
         parenthesization character is "(" or ")".
-    """
-    # TODO
-    pass
+    """ 
+
+
+    # Create  our List to store the parenthesization results
+    intial_ParenList = []
+    # Traverse through this string and add our intial parenthesis list
+    for char in parenthesization:
+        if char == "(":
+            intial_ParenList.append(0)
+        elif char == ")":
+            intial_ParenList.append(1)
+    secondary_ParenList = []
+    
+    # Traverse through this list and add our secondary parenthesis list
+    for value in intial_ParenList:
+        if value == 0:
+            secondary_ParenList.append([1,0])
+        elif value == 1:
+            secondary_ParenList.append([0,1])
+            
+    # Flatten our Secondary List 
+    Flattened_ParenList = []
+    for sublist in secondary_ParenList:
+        for item in sublist:
+            Flattened_ParenList.append(item)
+        
+    return torch.tensor(Flattened_ParenList, dtype=torch.int8)
+
 
 class ParenthesizationDataset(Dataset):
     def __init__(self, n):
