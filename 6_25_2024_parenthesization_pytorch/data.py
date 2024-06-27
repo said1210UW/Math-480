@@ -5,7 +5,7 @@ import torch.nn.functional as F
 from torch import nn
 
 device = "cpu"
-
+#
 def parenthesization_to_tensor(parenthesization):
     """
     Convert a parenthesization string to a pytorch tensor representation.
