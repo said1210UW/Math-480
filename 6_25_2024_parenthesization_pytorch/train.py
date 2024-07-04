@@ -22,13 +22,6 @@ def train_one_epoch(training_loader, model, loss_fn, optimizer):
 
         # Zero the gradients
         optimizer.zero_grad()
-
-        for input in inputs:
-            input.to(torch.float32)
-            print(input.dtype)
-        for label in labels:
-            label.to(torch.float32)
-            print(label.dtype)
         
         # Prediction y-hat
         outputs = model(inputs)
@@ -42,8 +35,8 @@ def train_one_epoch(training_loader, model, loss_fn, optimizer):
 
         #Gather Data
         total_loss += loss.item()
-    # Total loss over all batches
-    return total_loss / len(training_loader)
+   
+    return total_loss
 
 def evaluate_model(model, test_dataset):
     """
@@ -61,10 +54,9 @@ def evaluate_model(model, test_dataset):
     with torch.no_grad():
         confusion_matrix = [[0, 0], [0, 0]]
         # TODO
-        for inputs, targets in test_dataset:
-            outputs = model(inputs)
-            predicted_labels = torch.argmax(outputs, dim=1)
-            for target, predicted in zip(targets, predicted_labels):
-                confusion_matrix[target.item()][predicted.item()] += 1
+        for data in test_dataset:
+            input, label = data
+            outputs = model(input)
+            confusion_matrix[label][torch.argmax(outputs)] += 1
             
     return confusion_matrix

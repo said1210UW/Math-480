@@ -44,7 +44,7 @@ def parenthesization_to_tensor(parenthesization):
         for item in sublist:
             Flattened_ParenList.append(item)
         
-    return torch.tensor(Flattened_ParenList, dtype=torch.int8)
+    return torch.tensor(Flattened_ParenList, dtype= torch.float32)
 
 
 class ParenthesizationDataset(Dataset):
