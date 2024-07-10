@@ -7,6 +7,7 @@ CLS_TOKEN = 2  # Classification token
 PAD_TOKEN = 3  # Padding token
 MAX_LEN = 32
 
+# asda
 
 def parenthesization_to_tensor(parenthesization):
     """
