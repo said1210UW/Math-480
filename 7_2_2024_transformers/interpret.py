@@ -14,10 +14,20 @@ def plot_linear_layer(layer,):
     # TODO
     
     # Get the weights of the layer
-    weights = layer.weight.detach().numpy()
+    weights = layer.weight.data.cpu().numpy()
 
+    # Create a heatmap
+    plt.figure(figsize=(10, 8))
     plt.imshow(weights, cmap="bwr")
+    plt.colorbar(label = "Weight Value")
     
+    # Add labels and title
+    plt.title('Heatmap of Weights in Linear Layer')
+    plt.xlabel('Input Features')
+    plt.ylabel('Output Features')
+
+    plt.show()
+  
 
 
 def incorrect_predictions(model, dataloader):
@@ -38,17 +48,21 @@ def incorrect_predictions(model, dataloader):
 
     with torch.no_grad():
         incorrect_predictions = [[], []]
-        # TODO
-        for inputs, labels in dataloader:
-            inputs =inputs.to(model.device)
-            labels = labels.to(model.device)
-        
-            output = model(inputs)
-            predicted_labels = torch.argmax(output, dim=1)
 
+        for inputs, labels in dataloader:
+            inputs, labels = inputs.to(model.device), labels.to(model.device)
+
+            # Get Model predictions
+            outputs = model(inputs)
+            _, predicted = torch.max(outputs, 1)
+
+            # Index of incorrect predictions
             for i in range(len(labels)):
-                if labels[i] != predicted_labels[i]:
-                    incorrect_predictions[labels[i].item()].append(inputs[i].tolist())
+                if predicted[i] != labels[i]:
+                    input_list = input[i].cpu().numpy().tolist()
+                    label_index = labels[i].item()
+                    incorrect_predictions[label_index].append(input_list)
+        
     return incorrect_predictions
 
 
@@ -66,10 +80,28 @@ def token_contributions(model, single_input):
     Returns:
         List[float]: A list of contributions of each token to the model's output.
     """
-    output = model(single_input, mask=padding_mask(single_input))
+    mask = padding_mask(single_input)
+
+    # Get the original model output
+    output = model(single_input, mask=mask)
+    original_prediction = torch.softmax(output, dim=1)
 
     result = []
-    # TODO
+    sequence_length = single_input.size(1)
+
+    for i in range(sequence_length):
+        modified_input = single_input.clone()
+
+        modified_input[:, i] = PAD_TOKEN
+
+        # Get the model output with the modified input
+        modified_output = model(modified_input, mask = padding_mask(modified_input))
+        modified_prediction = torch.softmax(modified_output, dim=1)
+
+        # Calculate the result as the difference between original and modified predictions
+        result_item = original_prediction - modified_prediction
+        result.append(result_item.detach().cpu().numpy())
+
     return result
 
 def activations(model, dataloader):
@@ -85,5 +117,26 @@ def activations(model, dataloader):
         List[int]: A list of frequencies for each hidden feature in the feedforward layer of the model.
     """
     result = []
-    # TODO
+    model.eval()
+    # Register a forward hook to capture the activations
+    feedforward_layer = model.feedforward  # Adjust this to your model's architecture
+    hook = feedforward_layer.register_forward_hook(
+        lambda module, input, output: result.append(output.detach().cpu().numpy())
+    )
+    
+    with torch.no_grad():
+        for inputs, _ in dataloader:
+            inputs = inputs.to(next(model.parameters()).device)
+            model(inputs)
+    hook.remove()
+
+    # Count activations
+    num_features = result[0].size(1)  # Assuming the shape is (batch_size, num_features)
+    frequencies = [0] * num_features
+
+    for activations in result:
+        activated_indices = torch.argmax(activations, dim=1)
+        for index in activated_indices:
+            frequencies[index.item()] += 1
+
     return result
