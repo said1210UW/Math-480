@@ -30,7 +30,7 @@ def plot_linear_layer(layer,):
   
 
 
-def incorrect_predictions(model, dataloader):
+def incorrect_predictions(model, dataloader,):
     """
     Given a model and a dataloader, this function evaluates the model by predicting the labels for each input in the dataloader.
     It keeps track of incorrect predictions and returns a list of inputs that were incorrectly predicted for each label.
@@ -46,11 +46,13 @@ def incorrect_predictions(model, dataloader):
     """
     model.eval()
 
+    device = next(model.parameters()).device
+
     with torch.no_grad():
         incorrect_predictions = [[], []]
 
         for inputs, labels in dataloader:
-            inputs, labels = inputs.to(model.device), labels.to(model.device)
+            inputs, labels = inputs.to(device), labels.to(device)
 
             # Get Model predictions
             outputs = model(inputs)
@@ -59,9 +61,8 @@ def incorrect_predictions(model, dataloader):
             # Index of incorrect predictions
             for i in range(len(labels)):
                 if predicted[i] != labels[i]:
-                    input_list = input[i].cpu().numpy().tolist()
-                    label_index = labels[i].item()
-                    incorrect_predictions[label_index].append(input_list)
+                    input_list = inputs[i].tolist()
+                    incorrect_predictions.append(input_list)
         
     return incorrect_predictions
 
