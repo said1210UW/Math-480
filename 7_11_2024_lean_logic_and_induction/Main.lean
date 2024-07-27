@@ -12,25 +12,25 @@ import Mathlib.Algebra.BigOperators.Group.Finset
 
 -- Assignment 1: Show that 2^n % 7 = 1, 2, or 4 for all n.
 theorem assignment1 : ∀ n:ℕ, 2^n % 7 = 1 ∨ 2^n % 7 = 2 ∨ 2^n % 7 = 4 := by
-    intro n
-    induction n with
-    | zero =>
-        simp[Nat.pow_zero]
-    | succ n ih =>
-      have h : 2^(n + 1) % 7 = (2 * (2^n % 7)) % 7 := by
-        rw [Nat.pow_succ, Nat.mod_mul_left]
-      cases ih with
-      | inl h1 =>
-        have: 2 * 1 % 7 = 2 := by simp
-        exact Or.inr this
-      | inr h2 =>
-        cases h2 with
-        | inl h3 =>
-          have : 2 * 2 % 7 = 4 := by simp
-          exact Or.inr this
-        | inr h4 =>
-          have: 2 * 4 % 7 = 1 := by simp [Nat.mod_eq_of_lt, Nat.le_of_lt_succ]
-          exact Or.inl this
+  intro n
+  induction n with
+  | zero =>
+    simp[Nat.pow_zero]
+  | succ n ih =>
+    have h : 2^(n + 1) % 7 = (2 * (2^n % 7)) % 7 := by
+      rw [Nat.pow_succ, Nat.mod_mul]
+    cases (2^n % 7) with
+    | 1 =>
+      have: 2 * 1 % 7 = 2 := by simp
+      exact Or.inr this
+    | 2 =>
+      have : 2 * 2 % 7 = 4 := by simp
+      exact Or.inr this
+    | 4 =>
+      have: 2 * 4 % 7 = 1 := by simp [Nat.mod_eq_of_lt, Nat.le_of_lt_succ]
+      exact Or.inl this
+    | _ =>
+      rfl
 
 -- Assignment 2: Show that (1-x)*(1+x+x^2+...+x^{n-1}) = (1-x^n)
 theorem assignment2
